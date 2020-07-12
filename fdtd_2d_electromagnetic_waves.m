@@ -10,7 +10,7 @@ degrau = 0;
 %---------------------------Escolha a condutividadae elétrica---------------------------%
 %Valores obtidos em https://en.wikipedia.org/wiki/Electrical_resistivity_and_conductivity
 
-%Vácuo
+% Vácuo
 sigma = 0;
 
 % PET
@@ -19,7 +19,7 @@ sigma = 0;
 % Borracha
 % sigma = 10^(-14);
 
-% Video
+% Vidro
 % sigma = 10^(-11);
 
 % Água destilada
@@ -76,23 +76,24 @@ elseif seno == 1
 end
 
 
+
 %--------------------------------inicio da iteracao--------------------------------%
 for n = 2:(Nt-1)      
     for x = 1:(Nx-1)
         for y = 1:(Ny-1)
-             Hx(x, y, n) = Da*Hx(x, y, n-1) + Db*(Ez(x, y, n-1) - Ez(x, y+1, n-1));
+             Hx(x, y, n) = Da*Hx(x, y, n-1) + Db*(Ez(x, y, n) - Ez(x, y+1, n));
         end
     end
 
     for x = 1:(Nx-1)
         for y = 1:(Ny-1)
-             Hy(x, y, n) = Da*Hy(x, y, n-1) + Db*(Ez(x+1, y, n-1) - Ez(x, y, n-1));
+             Hy(x, y, n) = Da*Hy(x, y, n-1) + Db*(Ez(x+1, y, n) - Ez(x, y, n));
         end
     end
     
     for x = 3:(Nx-2)
         for y = 3:(Ny-2)
-            Ez(x, y, n) = Ca*Ez(x, y, n-1) + Cb*(Hy(x, y, n) - Hy(x-1, y, n) + Hx(x, y-1, n) - Hx(x, y, n));
+            Ez(x, y, n+1) = Ca*Ez(x, y, n) + Cb*(Hy(x, y, n) - Hy(x-1, y, n) + Hx(x, y-1, n) - Hx(x, y, n));
         end
     end
     
@@ -100,23 +101,23 @@ for n = 2:(Nt-1)
     %a fonte impulso não força nenhuma excitação durante a execução das
     %interações
     if degrau == 1
-        Ez(centerX, centerY, n) = 1;
+        Ez(centerX, centerY, n+1) = 1;
     elseif seno == 1
-        Ez(centerX, centerY, n) = sin(n*2*pi*5/Nt);
+        Ez(centerX, centerY, n+1) = sin(n*2*pi*5/Nt);
     end
     
     %Condições de borda
-    Ez(1:Nx, 1  , n)=0;
-    Ez(1:Nx, Ny , n)=0;
-    Ez(1   ,1:Ny, n)=0;
-    Ez(Nx  ,1:Ny, n)=0;
+    Ez(1:Nx, 1  , n+1)=0;
+    Ez(1:Nx, Ny , n+1)=0;
+    Ez(1   ,1:Ny, n+1)=0;
+    Ez(Nx  ,1:Ny, n+1)=0;
             
 end
 
 
 x = 1:1:Nx;
 for n=1:Nt              
-    figure(1)
+    f1 = figure(1);
     tiledlayout(2,1)
     mesh(x,x,Ez(:,:,n),'linewidth',2);
     zlim([-1 1]);
@@ -131,15 +132,19 @@ for n=1:Nt
 	grid on
 	grid minor
     
- 
     
-    figure(2)
-    imagesc(delta*(1:1:Nx)*1e+6,(1e+6*delta*(1:1:Ny))',Ez(:,:,n)',[-0.35,0.35]);colorbar;
+    f2 = figure(2);
+    imagesc(delta*(1:1:Nx)*1e+6,(1e+6*delta*(1:1:Ny))',Ez(:,:,n)',[-0.5,0.5]);colorbar;
     title([titulo num2str(n)]); 
     xlabel('X');
     ylabel('Y');
-%     set(gca,'FontSize',20);
-% 	getframe();
+
+%     if(mod(n,20) == 0)
+%         saveas(f1,sprintf('e3_8_Ez_vidro_3d_i%d.png',n));
+%         saveas(f2,sprintf('e3_8_Ez_vidro_2d_i%d.png',n));
+%     end
+%     getframe();
+%     pause;
 	
 end
 
