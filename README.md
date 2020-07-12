@@ -1,4 +1,4 @@
-#2D FDTD using TMz equations for electric and magnetic waves simulation
+# 2D FDTD using TMz equations for electric and magnetic waves simulation
 
 The presented codes simulate electric and magnetic waves in free space with a perfect conductor as a boundary.
 
